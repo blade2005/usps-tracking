@@ -1,4 +1,5 @@
 #!/usr/bin/python
+"""Track packages with USPS API."""
 # import pyusps
 from __future__ import with_statement
 import os
@@ -7,8 +8,6 @@ import urllib2
 import urllib
 import xml.etree.ElementTree as ET
 import ConfigParser
-
-import argparse
 
 parser = argparse.ArgumentParser(description='Track a package')
 parser.add_argument('-t', '--tracking_id', metavar='TRACKING ID', type=str,
@@ -22,7 +21,9 @@ with open(os.environ['HOME']+'/.usps.conf') as config_h:
     config.readfp(config_h)
 settings = dict(config.items('USPS'))
 
+
 def get_tracking_info(tracking_id):
+    """Query USPS API for tracking info."""
     base_uri = 'https://secure.shippingapis.com/ShippingAPI.dll'
     xml_string = ('<TrackRequest USERID="{}"><TrackID ID="{}"></TrackID>'
                   '</TrackRequest>'.format(settings['username'], tracking_id))
@@ -37,7 +38,9 @@ def get_tracking_info(tracking_id):
     root = ET.fromstring(data)
     return root
 
+
 def main():
+    """Main."""
     root = get_tracking_info(args.tracking_id)
     trackinfos = root.findall('TrackInfo')
     if trackinfos:
@@ -57,4 +60,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
